@@ -39,7 +39,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
@@ -48,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private String selectedRow;
     private double totalAmount;
     private int receiptNo;
+    private double prevAmount;
+    private double depositAmount;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             final AutoCompleteTextView accountTypeView = findViewById(R.id.accountType);
             ArrayAdapter<String> accountTypeViewAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, Arrays.asList("PIGMY", "LOAN"));
             accountTypeView.setAdapter(accountTypeViewAdapter);
-            accountTypeView.setThreshold(1);
+            accountTypeView.setThreshold(0);
 
             List<String> list = readDataExternal();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -80,15 +81,16 @@ public class MainActivity extends AppCompatActivity {
                 autoCompleteTextView.setAdapter(arrayAdapter);
                 autoCompleteTextView.setThreshold(0);
 
-                AtomicReference<Double> prevAmount = new AtomicReference<>((double) 0);
+                //AtomicReference<Double> prevAmount = new AtomicReference<>((double) 0);
                 autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
                     String selectedField = (String) parent.getItemAtPosition(position);
 
                     selectedRow = map.get(selectedField);
                     assert selectedRow != null;
-                    prevAmount.set(Double.parseDouble(selectedRow.split(",")[6]));
+                    //prevAmount.set(Double.parseDouble(selectedRow.split(",")[6]));
+                    prevAmount = Double.parseDouble(selectedRow.split(",")[6]);
                     EditText editText = findViewById(R.id.number1_edit_text);
-                    editText.setText(String.valueOf(prevAmount.get()));
+                    editText.setText(String.valueOf(prevAmount));
                     editText.setFocusable(false);
 
                     textView.setText("");
@@ -99,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
                         if (isDigitsOnly(s) && s.length() > 0) {
-                            totalAmount = Double.parseDouble(s.toString()) + prevAmount.get();
+                            depositAmount = Double.parseDouble(s.toString());
+                            totalAmount = depositAmount + prevAmount;
                             textView.setText(String.valueOf(totalAmount));
                         } else {
                             textView.setText("");
@@ -179,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @SuppressLint("SimpleDateFormat") String date = new SimpleDateFormat("dd.MM.yy").format(new Date());
+        @SuppressLint("SimpleDateFormat") String dateAndTime = new SimpleDateFormat("dd.MM.yy hh:mm:ss").format(new Date());
 
         receiptNo++;
         String receipt = String.format("%0" + (5 - String.valueOf(receiptNo).length()) + "d%s", 0, receiptNo);
@@ -191,7 +195,14 @@ public class MainActivity extends AppCompatActivity {
 
         String s = list.get(list.size() - 1);
         Intent intent = new Intent(MainActivity.this, CustomerReceipt.class);
-        intent.putExtra("total_amount", s);
+        intent.putExtra("date_time", dateAndTime);
+        intent.putExtra("agent_code", "12345");
+        intent.putExtra("acc_type", accType.trim());
+        intent.putExtra("customer_name", customerName.trim());
+        intent.putExtra("acc_no", accNo.trim());
+        intent.putExtra("prev_balance", String.valueOf(prevAmount));
+        intent.putExtra("deposit_amount", String.valueOf(depositAmount));
+        intent.putExtra("total_amount", String.valueOf(totalAmount));
         startActivity(intent);
     }
 
