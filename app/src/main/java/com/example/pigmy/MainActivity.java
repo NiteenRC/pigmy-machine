@@ -31,9 +31,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,12 +45,18 @@ public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
     private final Map<String, String> map = new HashMap<>();
     private final List<String> list = new ArrayList<>();
+    private String selectedRow;
+    private double totalAmount;
+    private int receiptNo;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        TextView textView = findViewById(R.id.total_amount);
+        EditText resultTextView = findViewById(R.id.number2_edit_text);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             askPermission();
         }
@@ -70,28 +78,28 @@ public class MainActivity extends AppCompatActivity {
                 final AutoCompleteTextView autoCompleteTextView = findViewById(R.id.autoCompleteTextView1);
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, accNos);
                 autoCompleteTextView.setAdapter(arrayAdapter);
-                autoCompleteTextView.setThreshold(1);
+                autoCompleteTextView.setThreshold(0);
 
                 AtomicReference<Double> prevAmount = new AtomicReference<>((double) 0);
                 autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
                     String selectedField = (String) parent.getItemAtPosition(position);
 
-                    String value = map.get(selectedField);
-                    assert value != null;
-                    prevAmount.set(Double.parseDouble(value.split(",")[6]));
+                    selectedRow = map.get(selectedField);
+                    assert selectedRow != null;
+                    prevAmount.set(Double.parseDouble(selectedRow.split(",")[6]));
                     EditText editText = findViewById(R.id.number1_edit_text);
                     editText.setText(String.valueOf(prevAmount.get()));
                     editText.setFocusable(false);
 
+                    textView.setText("");
+                    resultTextView.setText("");
                 });
 
-                EditText resultTextView = findViewById(R.id.number2_edit_text);
                 resultTextView.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        TextView textView = findViewById(R.id.total_amount);
                         if (isDigitsOnly(s) && s.length() > 0) {
-                            double totalAmount = Double.parseDouble(s.toString()) + prevAmount.get();
+                            totalAmount = Double.parseDouble(s.toString()) + prevAmount.get();
                             textView.setText(String.valueOf(totalAmount));
                         } else {
                             textView.setText("");
@@ -146,15 +154,44 @@ public class MainActivity extends AppCompatActivity {
 
     public void onAddButtonClick(View view) throws IOException {
         Path path = createFile("receive.txt");
-        list.add("");
+        if (list.isEmpty()) {
+            list.add("000,12345,0000000000002900.00,00000000000000000009,0000000006,16.02.23,12345");
+        }
+
+        //000,+,PIGMY,0001               ,0000000.00,GANGADAR BADIGER    ,0000100.00,27.12.22,0000000.00@
+        //000,PIGMY,0249               ,SRINIVASH MADAG     ,0000100.00,16.02.23,00005
+        String accType = selectedRow.split(",")[2];
+        String accNo = selectedRow.split(",")[3];
+        String customerName = selectedRow.split(",")[5];
+
+        String prevAmountSuffix = String.valueOf(totalAmount);
+
+        String currentAmount = "";
+        if (prevAmountSuffix.length() == 9) {
+            currentAmount = String.format("%0" + (10 - prevAmountSuffix.length()) + "d%s", 0, prevAmountSuffix);
+        } else {
+            currentAmount = String.format("%0" + (9 - prevAmountSuffix.length()) + "d%s", 0, prevAmountSuffix);
+            currentAmount = currentAmount.split("\\.")[1].length() == 1 ? currentAmount + "0" : currentAmount;
+        }
+
+        if (currentAmount.length() == 9) {
+            currentAmount = "0" + currentAmount;
+        }
+
+        @SuppressLint("SimpleDateFormat") String date = new SimpleDateFormat("dd.MM.yy").format(new Date());
+
+        receiptNo++;
+        String receipt = String.format("%0" + (5 - String.valueOf(receiptNo).length()) + "d%s", 0, receiptNo);
+
+        list.add("000," + accType + "," + accNo + "," + customerName + "," + currentAmount + "," + date + "," + receipt);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Files.write(path, list, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         }
 
-        String s = list.get(list.size()-1);
+        String s = list.get(list.size() - 1);
         Intent intent = new Intent(MainActivity.this, CustomerReceipt.class);
-        //intent.putExtra("total_amount", s);
+        intent.putExtra("total_amount", s);
         startActivity(intent);
     }
 

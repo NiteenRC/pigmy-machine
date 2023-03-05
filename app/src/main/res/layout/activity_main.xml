@@ -43,6 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/number1_edit_text"
         android:hint="@string/amount"
+        android:inputType="number"
         android:paddingStart="5dp"
         android:paddingTop="20dp"
         android:paddingEnd="20dp" />

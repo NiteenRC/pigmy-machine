@@ -22,9 +22,6 @@ public class CustomerReceipt extends AppCompatActivity {
     }
 
     public void onPrintClick(View view) {
-        TextView textView = findViewById(R.id.total_amount);
-        Intent intent = getIntent();
-        String str = intent.getStringExtra("total_amount");
-        textView.setText(str);
+
     }
 }
