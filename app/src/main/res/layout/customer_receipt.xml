@@ -1,0 +1,33 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="20dp"
+    android:paddingTop="20dp"
+    android:paddingRight="20dp"
+    android:paddingBottom="20dp"
+    tools:context=".CustomerReceipt">
+
+    <TextView
+        android:id="@+id/total_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/total_amount"
+        android:paddingStart="5dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="20dp"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/add_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/total_amount"
+        android:onClick="onPrintClick"
+        android:paddingStart="5dp"
+        android:paddingTop="40dp"
+        android:paddingEnd="20dp"
+        android:text="@string/print" />
+
+</RelativeLayout>

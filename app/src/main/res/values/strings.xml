@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Royal Finance Corporation</string>
+    <string name="acc_type">Acc Type</string>
+    <string name="name_or_acc_no">Name or Acc No</string>
+    <string name="previous_amount">Previous Amount</string>
+    <string name="amount">Amount</string>
+    <string name="total_amount">Total Amount</string>
+    <string name="submit">Submit</string>
+    <string name="print">Print</string>
 </resources>

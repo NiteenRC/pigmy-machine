@@ -9,15 +9,65 @@
     tools:context=".MainActivity">
 
     <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextView1"
-        android:layout_width="wrap_content"
+        android:id="@+id/accountType"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
-        android:width="500dp"
-        android:ems="10"
-        android:hint="Name or Acc No">
+        android:hint="@string/acc_type"
+        android:paddingStart="5dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="20dp" />
 
-        <requestFocus />
-    </AutoCompleteTextView>
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/accountType"
+        android:hint="@string/name_or_acc_no"
+        android:paddingStart="5dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="20dp" />
+
+    <EditText
+        android:id="@+id/number1_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/autoCompleteTextView1"
+        android:hint="@string/previous_amount"
+        android:paddingStart="5dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="20dp" />
+
+    <EditText
+        android:id="@+id/number2_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/number1_edit_text"
+        android:hint="@string/amount"
+        android:paddingStart="5dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="20dp" />
+
+    <TextView
+        android:id="@+id/total_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/number2_edit_text"
+        android:hint="@string/total_amount"
+        android:paddingStart="5dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="20dp"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/add_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/total_amount"
+        android:onClick="onAddButtonClick"
+        android:paddingStart="5dp"
+        android:paddingTop="40dp"
+        android:paddingEnd="20dp"
+        android:text="@string/submit" />
 
 </RelativeLayout>
