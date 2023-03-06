@@ -9,30 +9,28 @@
     tools:context=".MainActivity">
 
     <AutoCompleteTextView
-        android:id="@+id/accountType"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/acc_type"
-        android:paddingStart="5dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="20dp" />
-
-    <AutoCompleteTextView
         android:id="@+id/autoCompleteTextView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/accountType"
         android:hint="@string/name_or_acc_no"
         android:paddingStart="5dp"
         android:paddingTop="20dp"
         android:paddingEnd="20dp" />
 
-    <EditText
-        android:id="@+id/number1_edit_text"
+    <TextView
+        android:id="@+id/accountType"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/autoCompleteTextView1"
-        android:hint="@string/previous_amount"
+        android:paddingStart="5dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="20dp" />
+
+    <TextView
+        android:id="@+id/number1_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/accountType"
         android:paddingStart="5dp"
         android:paddingTop="20dp"
         android:paddingEnd="20dp" />

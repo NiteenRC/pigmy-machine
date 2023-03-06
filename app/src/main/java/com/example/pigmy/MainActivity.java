@@ -33,7 +33,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,6 +57,12 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = findViewById(R.id.total_amount);
         EditText resultTextView = findViewById(R.id.number2_edit_text);
 
+        TextView editText = findViewById(R.id.number1_edit_text);
+        editText.setText("Prev Amt: ");
+
+        final TextView accountTypeView = findViewById(R.id.accountType);
+        accountTypeView.setText("Acc Type: ");
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             askPermission();
         }
@@ -67,58 +72,88 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
 
             //Need to check permission
-            final AutoCompleteTextView accountTypeView = findViewById(R.id.accountType);
-            ArrayAdapter<String> accountTypeViewAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, Arrays.asList("PIGMY", "LOAN"));
-            accountTypeView.setAdapter(accountTypeViewAdapter);
-            accountTypeView.setThreshold(0);
-
             List<String> list = readDataExternal();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                list.forEach(x -> map.put(x.split(",")[5].trim() + " " + x.split(",")[3].trim(), x));
+                list.forEach(x -> map.put(x.split(",")[5].trim() + " " + x.split(",")[1].trim() + " " + x.split(",")[3].trim(), x));
                 List<String> accNos = new ArrayList<>(map.keySet());
                 final AutoCompleteTextView autoCompleteTextView = findViewById(R.id.autoCompleteTextView1);
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, accNos);
                 autoCompleteTextView.setAdapter(arrayAdapter);
                 autoCompleteTextView.setThreshold(0);
 
-                //AtomicReference<Double> prevAmount = new AtomicReference<>((double) 0);
-                autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
-                    String selectedField = (String) parent.getItemAtPosition(position);
-
-                    selectedRow = map.get(selectedField);
-                    assert selectedRow != null;
-                    //prevAmount.set(Double.parseDouble(selectedRow.split(",")[6]));
-                    prevAmount = Double.parseDouble(selectedRow.split(",")[6]);
-                    EditText editText = findViewById(R.id.number1_edit_text);
-                    editText.setText(String.valueOf(prevAmount));
-                    editText.setFocusable(false);
-
-                    textView.setText("");
-                    resultTextView.setText("");
-                });
-
-                resultTextView.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (isDigitsOnly(s) && s.length() > 0) {
-                            depositAmount = Double.parseDouble(s.toString());
-                            totalAmount = depositAmount + prevAmount;
-                            textView.setText(String.valueOf(totalAmount));
-                        } else {
-                            textView.setText("");
-                        }
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                    }
-
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    }
-                });
+                resetAccTypeAndPrevAmt(editText, accountTypeView, autoCompleteTextView, textView, resultTextView);
+                onTextChangedForAccountSelection(textView, resultTextView, editText, accountTypeView, autoCompleteTextView);
+                onTextChangedForDepositAmt(textView, resultTextView);
             }
         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void onTextChangedForAccountSelection(TextView textView, EditText resultTextView, TextView editText, TextView accountTypeView, AutoCompleteTextView autoCompleteTextView) {
+        autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedField = (String) parent.getItemAtPosition(position);
+
+            selectedRow = map.get(selectedField);
+            assert selectedRow != null;
+            accountTypeView.setText("Acc Type: " + selectedRow.split(",")[2]);
+            assert selectedRow != null;
+            prevAmount = Double.parseDouble(selectedRow.split(",")[6]);
+
+            editText.setText("Prev Amt: " + prevAmount);
+            editText.setFocusable(false);
+
+            textView.setText("");
+            resultTextView.setText("");
+        });
+    }
+
+    private void onTextChangedForDepositAmt(TextView textView, EditText resultTextView) {
+        resultTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (isDigitsOnly(s) && s.length() > 0) {
+                    depositAmount = Double.parseDouble(s.toString());
+
+                    String creditOrDebit = selectedRow.split(",")[1];
+                    totalAmount = creditOrDebit.equals("+") ? (prevAmount + depositAmount) : (prevAmount - depositAmount);
+
+                    textView.setText(String.valueOf(totalAmount));
+                } else {
+                    textView.setText("");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+        });
+    }
+
+    private void resetAccTypeAndPrevAmt(TextView editText, TextView accountTypeView, AutoCompleteTextView autoCompleteTextView, TextView textView, EditText resultTextView) {
+        autoCompleteTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() == 0) {
+                    editText.setText("Prev Amt: ");
+                    accountTypeView.setText("Acc Type: ");
+                    textView.setText("");
+                    resultTextView.setText("");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
     }
 
     private List<String> readDataExternal() {
