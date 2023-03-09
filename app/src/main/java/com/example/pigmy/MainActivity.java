@@ -43,7 +43,6 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
     private final Map<String, String> map = new HashMap<>();
-    private final List<String> list = new ArrayList<>();
     private String selectedRow;
     private double totalAmount;
     private int receiptNo;
@@ -60,10 +59,10 @@ public class MainActivity extends AppCompatActivity {
         EditText resultTextView = findViewById(R.id.number2_edit_text);
 
         TextView editText = findViewById(R.id.number1_edit_text);
-        editText.setText("Prev Amt: ");
+        editText.setText("PREV AMT: ");
 
         final TextView accountTypeView = findViewById(R.id.accountType);
-        accountTypeView.setText("Acc Type: ");
+        accountTypeView.setText("ACC TYPE: ");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             askPermission();
@@ -89,8 +88,8 @@ public class MainActivity extends AppCompatActivity {
 
                 Button btn = findViewById(R.id.clear_button);
                 btn.setOnClickListener(v -> {
-                    editText.setText("Prev Amt: ");
-                    accountTypeView.setText("Acc Type: ");
+                    editText.setText("PREV AMT: ");
+                    accountTypeView.setText("ACC TYPE: ");
                     textView.setText("");
                     resultTextView.setText("");
                     autoCompleteTextView.setText("");
@@ -129,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                         String validateCustomer = customerName.trim() + " " + creditOrDebit + " " + accNo.trim();
                         if (!customerNameAuto.equals(validateCustomer)) {
                             autoCompleteTextView.requestFocus();
-                            autoCompleteTextView.setError("Select valid customer");
+                            autoCompleteTextView.setError("SELECT VALID CUSTOMER");
                             return;
                         }
 
@@ -174,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("deposit_amount", String.valueOf(depositAmount));
                         intent.putExtra("total_amount", String.valueOf(totalAmount));
                         startActivity(intent);
-                        Toast.makeText(MainActivity.this, "Saved Successful", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Saved Successfully", Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -188,11 +187,11 @@ public class MainActivity extends AppCompatActivity {
 
             selectedRow = map.get(selectedField);
             assert selectedRow != null;
-            accountTypeView.setText("Acc Type: " + selectedRow.split(",")[2]);
+            accountTypeView.setText("ACC TYPE: " + selectedRow.split(",")[2]);
             assert selectedRow != null;
             prevAmount = Double.parseDouble(selectedRow.split(",")[6]);
 
-            editText.setText("Prev Amt: " + prevAmount);
+            editText.setText("PREV AMT: " + prevAmount);
             editText.setFocusable(false);
 
             textView.setText("");
@@ -209,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if (selectedRow == null) {
                         autoCompleteTextView.requestFocus();
-                        autoCompleteTextView.setError("Select valid customer");
+                        autoCompleteTextView.setError("SELECT VALID CUSTOMER");
                         return;
                     }
                     String creditOrDebit = selectedRow.split(",")[1];
@@ -241,8 +240,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() == 0) {
-                    editText.setText("Prev Amt: ");
-                    accountTypeView.setText("Acc Type: ");
+                    editText.setText("PREV AMT: ");
+                    accountTypeView.setText("ACC TYPE: ");
                     textView.setText("");
                     resultTextView.setText("");
                     prevAmount = 0;

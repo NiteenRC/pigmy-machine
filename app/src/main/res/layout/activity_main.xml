@@ -67,7 +67,6 @@
         android:layout_below="@+id/total_amount"
         android:layout_marginStart="20dp"
         android:layout_marginTop="50dp"
-        android:onClick="onAddButtonClick"
         android:paddingStart="10dp"
         android:paddingTop="10dp"
         android:paddingEnd="50dp"
