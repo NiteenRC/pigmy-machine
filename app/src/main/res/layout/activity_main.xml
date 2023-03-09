@@ -24,7 +24,8 @@
         android:layout_below="@+id/autoCompleteTextView1"
         android:paddingStart="5dp"
         android:paddingTop="20dp"
-        android:paddingEnd="20dp" />
+        android:paddingEnd="20dp"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/number1_edit_text"
@@ -33,7 +34,8 @@
         android:layout_below="@+id/accountType"
         android:paddingStart="5dp"
         android:paddingTop="20dp"
-        android:paddingEnd="20dp" />
+        android:paddingEnd="20dp"
+        android:textSize="18sp" />
 
     <EditText
         android:id="@+id/number2_edit_text"
@@ -60,13 +62,28 @@
 
     <Button
         android:id="@+id/add_button"
-        android:layout_width="match_parent"
+        android:layout_width="140dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/total_amount"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"
         android:onClick="onAddButtonClick"
-        android:paddingStart="5dp"
-        android:paddingTop="40dp"
-        android:paddingEnd="20dp"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="50dp"
         android:text="@string/submit" />
+
+    <Button
+        android:id="@+id/clear_button"
+        android:layout_width="140dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/total_amount"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="50dp"
+        android:layout_toEndOf="@+id/add_button"
+        android:paddingStart="5dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="20dp"
+        android:text="@string/clear" />
 
 </RelativeLayout>

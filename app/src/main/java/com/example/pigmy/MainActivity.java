@@ -16,6 +16,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -84,6 +85,15 @@ public class MainActivity extends AppCompatActivity {
                 resetAccTypeAndPrevAmt(editText, accountTypeView, autoCompleteTextView, textView, resultTextView);
                 onTextChangedForAccountSelection(textView, resultTextView, editText, accountTypeView, autoCompleteTextView);
                 onTextChangedForDepositAmt(textView, resultTextView);
+
+                Button btn = findViewById(R.id.clear_button);
+                btn.setOnClickListener(v -> {
+                    editText.setText("Prev Amt: ");
+                    accountTypeView.setText("Acc Type: ");
+                    textView.setText("");
+                    resultTextView.setText("");
+                    autoCompleteTextView.setText("");
+                });
             }
         }
     }
@@ -202,13 +212,13 @@ public class MainActivity extends AppCompatActivity {
         String accNo = selectedRow.split(",")[3];
         String customerName = selectedRow.split(",")[5];
 
-        String prevAmountSuffix = String.valueOf(totalAmount);
+        String depositAmountSuffix = String.valueOf(depositAmount);
 
         String currentAmount = "";
-        if (prevAmountSuffix.length() == 9) {
-            currentAmount = String.format("%0" + (10 - prevAmountSuffix.length()) + "d%s", 0, prevAmountSuffix);
+        if (depositAmountSuffix.length() == 9) {
+            currentAmount = String.format("%0" + (10 - depositAmountSuffix.length()) + "d%s", 0, depositAmountSuffix);
         } else {
-            currentAmount = String.format("%0" + (9 - prevAmountSuffix.length()) + "d%s", 0, prevAmountSuffix);
+            currentAmount = String.format("%0" + (9 - depositAmountSuffix.length()) + "d%s", 0, depositAmountSuffix);
             currentAmount = currentAmount.split("\\.")[1].length() == 1 ? currentAmount + "0" : currentAmount;
         }
 
