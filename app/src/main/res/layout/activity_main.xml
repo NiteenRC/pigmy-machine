@@ -71,6 +71,7 @@
         android:paddingTop="10dp"
         android:paddingEnd="50dp"
         android:text="@string/submit"
+        android:onClick="onClick"
         android:textAlignment="center" />
 
     <Button
@@ -85,5 +86,6 @@
         android:paddingTop="10dp"
         android:paddingEnd="20dp"
         android:text="@string/clear"
+        android:onClick="onClick"
         android:textAlignment="center" />
 </RelativeLayout>
