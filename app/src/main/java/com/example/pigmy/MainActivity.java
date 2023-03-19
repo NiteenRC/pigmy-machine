@@ -6,8 +6,13 @@ import static android.text.TextUtils.isDigitsOnly;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,11 +20,18 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,10 +43,25 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
+import androidx.navigation.NavGraph;
+import androidx.navigation.NavInflater;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+
+import com.example.pigmy.databinding.ActivityMainBinding;
+import com.example.pigmy.databinding.LayoutProfileDetailsNewBinding;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,7 +81,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
     private final Map<String, String> map = new HashMap<>();
     private String selectedRow;
@@ -67,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private List<String> dataList = new ArrayList<>();
 
-    private ActivityResultLauncher<Intent> activityResultLauncher =
+    /*private ActivityResultLauncher<Intent> activityResultLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult result) {
@@ -78,19 +105,132 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 }
-            });
+            });*/
+
+    private ActivityMainBinding binding;
+    private SharedPreferences sharedPreferences;
+
+    private NavController navController;
+
+    private PopupWindow popupWindow;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        askPermission();
+        sharedPreferences = getSharedPreferences(AppConstants.USER_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        Toolbar toolbar = findViewById(R.id.toolBar);
 
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+
+        NavInflater navInflater = navHostFragment.getNavController().getNavInflater();
+        NavGraph navGraph = navInflater.inflate(R.navigation.nav_graph);
+        if(sharedPreferences.getBoolean(AppConstants.USER_LOGGED_IN,false)){
+            navGraph.setStartDestination(R.id.homeFragment);
+        }else {
+            navGraph.setStartDestination(R.id.loginFragment);
+        }
+
+        navController = navHostFragment.getNavController();
+        navController.setGraph(navGraph);
+
+        NavigationView navView = findViewById(R.id.nav_view);
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration
+                .Builder(R.id.homeFragment)
+                .setOpenableLayout(binding.drawerLayout)
+                .build();
+
+        NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navView,navController);
+
+        navView.setNavigationItemSelectedListener(this);
+
+        View headerView = binding.navView.getHeaderView(0);
+        TextView tvPersonName = headerView.findViewById(R.id.tvPersonName);
+
+        binding.tvPersonShortName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final PopupWindow popupWindow = new PopupWindow(MainActivity.this);
+
+                LayoutProfileDetailsNewBinding binding = LayoutProfileDetailsNewBinding.inflate(getLayoutInflater());
+
+                binding.tvPersonName.setText(sharedPreferences.getString(AppConstants.USER_NAME,""));
+                binding.tvPersonCode.setText("Code: "+sharedPreferences.getString(AppConstants.USER_CODE,""));
+
+                popupWindow.setFocusable(true);
+                popupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
+                popupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+                popupWindow.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                popupWindow.setContentView(binding.getRoot());
+
+                binding.tvSignOut.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        logOut();
+                        popupWindow.dismiss();
+                    }
+                });
+
+                popupWindow.showAsDropDown(view, -40, 28);
+
+            }
+        });
+
+        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
+            @Override
+            public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
+                if(navDestination.getId()==R.id.loginFragment){
+                    toolbar.setVisibility(View.GONE);
+                    binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                }else {
+                    toolbar.setVisibility(View.VISIBLE);
+                    binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                }
+
+                tvPersonName.setText("Hey, "+sharedPreferences.getString(AppConstants.USER_NAME,""));
+                binding.tvPersonShortName.setText(sharedPreferences.getString(AppConstants.USER_SHORT_NAME,""));
+            }
+        });
     }
 
-    @SuppressLint("SetTextI18n")
+    private void showProfileDetailsDialog(){
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        LayoutProfileDetailsNewBinding binding = LayoutProfileDetailsNewBinding.inflate(getLayoutInflater());
+        builder.setView(binding.getRoot());
+
+        binding.tvPersonName.setText(sharedPreferences.getString(AppConstants.USER_NAME,""));
+        binding.tvPersonCode.setText("Code: "+sharedPreferences.getString(AppConstants.USER_CODE,""));
+
+        AlertDialog alertDialog = builder.create();
+        binding.tvSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                logOut();
+                alertDialog.dismiss();
+            }
+        });
+
+        builder.setPositiveButton("OK !", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        WindowManager.LayoutParams wmlp = alertDialog.getWindow().getAttributes();
+
+        wmlp.gravity = Gravity.TOP;
+        wmlp.x = 100;   //x position
+        wmlp.y = 100;
+
+        alertDialog.show();
+    }
+
+   /* @SuppressLint("SetTextI18n")
     private void onTextChangedForAccountSelection(TextView textView, EditText resultTextView, TextView editText, TextView accountTypeView, AutoCompleteTextView autoCompleteTextView) {
         autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
             String selectedField = (String) parent.getItemAtPosition(position);
@@ -107,9 +247,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             textView.setText("");
             resultTextView.setText("");
         });
-    }
+    }*/
 
-    private void onTextChangedForDepositAmt(TextView textView, EditText resultTextView) {
+    /*private void onTextChangedForDepositAmt(TextView textView, EditText resultTextView) {
         resultTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -175,9 +315,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // Permission denied
             }
         }
-    }
+    }*/
 
-    private void askPermission() {
+    /*private void askPermission() {
         //checking external storage permission is given or not...
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
@@ -197,8 +337,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             initGUI();
         }
-    }
+    }*/
 
+/*
     private void initGUI() {
         textView = findViewById(R.id.total_amount);
         resultTextView = findViewById(R.id.number2_edit_text);
@@ -225,20 +366,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         onTextChangedForDepositAmt(textView, resultTextView);
 
     }
+*/
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+       /* switch (view.getId()){
             case R.id.clear_button:
                 clearForm();
                 break;
             case R.id.add_button:
                 saveRecord();
                 break;
-        }
+        }*/
     }
 
-    private void saveRecord() {
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId()==R.id.profile){
+            binding.drawerLayout.close();
+            showProfileDetailsDialog();
+        }else if(item.getItemId()==R.id.logout){
+            binding.drawerLayout.close();
+            logOut();
+        }
+        return false;
+    }
+    private void logOut() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle("Log Out");
+        builder.setMessage("Are you sure ?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                sharedPreferences.edit().clear().apply();
+                navController.navigate(R.id.action_homeFragment_to_loginFragment);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.create().show();
+    }
+
+    /*private void saveRecord() {
         final String customerNameAuto = autoCompleteTextView.getText().toString();
         final String name = resultTextView.getText().toString();
 
@@ -317,5 +490,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         resultTextView.setText("");
         autoCompleteTextView.setText("");
         prevAmount = 0;
-    }
+    }*/
 }
