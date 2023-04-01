@@ -10,11 +10,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:background="@drawable/bg_iris"
-        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
     </LinearLayout>
 
@@ -33,11 +32,11 @@
         android:id="@+id/tvLoginLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="8dp"
         android:fontFamily="@font/open_sans_semibold"
         android:text="Login"
         android:textSize="24sp"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginVertical="8dp"
         app:layout_constraintBottom_toTopOf="@+id/tlCode"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -49,9 +48,9 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="8dp"
-        app:placeholderText="Enter your agent code"
         app:layout_constraintBottom_toTopOf="@+id/tlPassword"
-        app:layout_constraintTop_toBottomOf="@+id/tvLoginLabel">
+        app:layout_constraintTop_toBottomOf="@+id/tvLoginLabel"
+        app:placeholderText="Enter your agent code">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etCode"
@@ -70,8 +69,7 @@
         android:layout_marginVertical="8dp"
         app:layout_constraintBottom_toTopOf="@+id/btnLogin"
         app:layout_constraintTop_toBottomOf="@+id/tlCode"
-        app:passwordToggleEnabled="true"
-        >
+        app:passwordToggleEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPassword"

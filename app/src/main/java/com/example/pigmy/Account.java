@@ -7,26 +7,6 @@ import androidx.annotation.NonNull;
 
 public class Account implements Parcelable {
 
-    public Account(){
-
-    }
-
-    private String name, type,plusMinus,accNo;
-    private int id;
-
-    private double prevAmount;
-    private boolean act;
-
-    protected Account(Parcel in) {
-        name = in.readString();
-        type = in.readString();
-        plusMinus = in.readString();
-        accNo = in.readString();
-        id = in.readInt();
-        prevAmount = in.readDouble();
-        act = in.readByte() != 0;
-    }
-
     public static final Creator<Account> CREATOR = new Creator<Account>() {
         @Override
         public Account createFromParcel(Parcel in) {
@@ -38,6 +18,25 @@ public class Account implements Parcelable {
             return new Account[size];
         }
     };
+    private String name, type, plusMinus, accNo;
+    private int id;
+
+    private double prevAmount;
+    private boolean act;
+
+    public Account() {
+
+    }
+
+    protected Account(Parcel in) {
+        name = in.readString();
+        type = in.readString();
+        plusMinus = in.readString();
+        accNo = in.readString();
+        id = in.readInt();
+        prevAmount = in.readDouble();
+        act = in.readByte() != 0;
+    }
 
     public String getPlusMinus() {
         return plusMinus;

@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/profile"
-        android:title="Profile"
-        android:icon="@drawable/baseline_person_pin_"/>
+        android:icon="@drawable/baseline_person_pin_"
+        android:title="Profile" />
     <item
         android:id="@+id/logout"
-        android:title="Log Out"
-        android:icon="@drawable/baseline_logout_24"/>
+        android:icon="@drawable/baseline_logout_24"
+        android:title="Log Out" />
 
 </menu>

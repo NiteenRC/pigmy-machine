@@ -1,54 +1,25 @@
 package com.example.pigmy;
 
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static android.text.TextUtils.isDigitsOnly;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.Settings;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
@@ -63,33 +34,20 @@ import com.example.pigmy.databinding.LayoutProfileDetailsNewBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.security.Permission;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
     private final Map<String, String> map = new HashMap<>();
     private String selectedRow;
-    private double totalAmount,prevAmount,depositAmount;
+    private double totalAmount, prevAmount, depositAmount;
     private int receiptNo;
     private AutoCompleteTextView autoCompleteTextView;
 
-    private TextView textView,accountTypeView,editText;
+    private TextView textView, accountTypeView, editText;
     private EditText resultTextView;
 
     private List<String> dataList = new ArrayList<>();
@@ -128,9 +86,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         NavInflater navInflater = navHostFragment.getNavController().getNavInflater();
         NavGraph navGraph = navInflater.inflate(R.navigation.nav_graph);
-        if(sharedPreferences.getBoolean(AppConstants.USER_LOGGED_IN,false)){
+        if (sharedPreferences.getBoolean(AppConstants.USER_LOGGED_IN, false)) {
             navGraph.setStartDestination(R.id.homeFragment);
-        }else {
+        } else {
             navGraph.setStartDestination(R.id.loginFragment);
         }
 
@@ -144,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
 
         NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView,navController);
+        NavigationUI.setupWithNavController(navView, navController);
 
         navView.setNavigationItemSelectedListener(this);
 
@@ -158,8 +116,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 LayoutProfileDetailsNewBinding binding = LayoutProfileDetailsNewBinding.inflate(getLayoutInflater());
 
-                binding.tvPersonName.setText(sharedPreferences.getString(AppConstants.USER_NAME,""));
-                binding.tvPersonCode.setText("Code: "+sharedPreferences.getString(AppConstants.USER_CODE,""));
+                binding.tvPersonName.setText(sharedPreferences.getString(AppConstants.USER_NAME, ""));
+                binding.tvPersonCode.setText("Code: " + sharedPreferences.getString(AppConstants.USER_CODE, ""));
 
                 popupWindow.setFocusable(true);
                 popupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
@@ -183,27 +141,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
             public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
-                if(navDestination.getId()==R.id.loginFragment){
+                if (navDestination.getId() == R.id.loginFragment) {
                     toolbar.setVisibility(View.GONE);
                     binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                }else {
+                } else {
                     toolbar.setVisibility(View.VISIBLE);
                     binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 }
 
-                tvPersonName.setText("Hey, "+sharedPreferences.getString(AppConstants.USER_NAME,""));
-                binding.tvPersonShortName.setText(sharedPreferences.getString(AppConstants.USER_SHORT_NAME,""));
+                tvPersonName.setText("Hey, " + sharedPreferences.getString(AppConstants.USER_NAME, ""));
+                binding.tvPersonShortName.setText(sharedPreferences.getString(AppConstants.USER_SHORT_NAME, ""));
             }
         });
     }
 
-    private void showProfileDetailsDialog(){
+    private void showProfileDetailsDialog() {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutProfileDetailsNewBinding binding = LayoutProfileDetailsNewBinding.inflate(getLayoutInflater());
         builder.setView(binding.getRoot());
 
-        binding.tvPersonName.setText(sharedPreferences.getString(AppConstants.USER_NAME,""));
-        binding.tvPersonCode.setText("Code: "+sharedPreferences.getString(AppConstants.USER_CODE,""));
+        binding.tvPersonName.setText(sharedPreferences.getString(AppConstants.USER_NAME, ""));
+        binding.tvPersonCode.setText("Code: " + sharedPreferences.getString(AppConstants.USER_CODE, ""));
 
         AlertDialog alertDialog = builder.create();
         binding.tvSignOut.setOnClickListener(new View.OnClickListener() {
@@ -382,15 +340,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId()==R.id.profile){
+        if (item.getItemId() == R.id.profile) {
             binding.drawerLayout.close();
             showProfileDetailsDialog();
-        }else if(item.getItemId()==R.id.logout){
+        } else if (item.getItemId() == R.id.logout) {
             binding.drawerLayout.close();
             logOut();
         }
         return false;
     }
+
     private void logOut() {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle("Log Out");

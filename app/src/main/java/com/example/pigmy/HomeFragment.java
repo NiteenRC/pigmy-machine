@@ -11,6 +11,17 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -24,19 +35,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
 
-import android.os.Environment;
-import android.provider.Settings;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.example.pigmy.databinding.FragmentHomeBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -47,7 +45,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,32 +52,23 @@ import java.util.Locale;
 import java.util.Map;
 
 public class HomeFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private FragmentHomeBinding binding;
-    private SharedPreferences sharedPreferences;
-
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
     private final Map<String, String> map = new HashMap<>();
-    private double totalAmount,prevAmount,depositAmount;
+    // TODO: Rename and change types of parameters
+    private FragmentHomeBinding binding;
+    private SharedPreferences sharedPreferences;
+    private double totalAmount, prevAmount, depositAmount;
     private int receiptNo;
-    private List<String> dataList = new ArrayList<>();
-
-       private ActivityResultLauncher<Intent> activityResultLauncher =
+    private final List<String> dataList = new ArrayList<>();
+    private List<Account> accountList;
+    private ArrayAdapter<Account> customerArrayAdapter;
+    private Account selectedAccount;
+    private final ActivityResultLauncher<Intent> activityResultLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        if (Environment.isExternalStorageManager())
-                        {
+                        if (Environment.isExternalStorageManager()) {
                             initGUI();
                         }
                     }
@@ -90,11 +78,6 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
         // Required empty public constructor
     }
-
-    private List<Account> accountList;
-    private ArrayAdapter<Account> customerArrayAdapter;
-
-    private Account selectedAccount;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,7 +89,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = FragmentHomeBinding.inflate(inflater,container,false);
+        binding = FragmentHomeBinding.inflate(inflater, container, false);
         askPermission();
         return binding.getRoot();
     }
@@ -160,7 +143,7 @@ public class HomeFragment extends Fragment {
                 .getSavedStateHandle().getLiveData("key").observe(requireActivity(), new Observer<Object>() {
                     @Override
                     public void onChanged(Object o) {
-                       clearForm();
+                        clearForm();
                     }
                 });
     }
@@ -201,20 +184,20 @@ public class HomeFragment extends Fragment {
             binding.tvAmount.setError("FIELD CANNOT BE EMPTY");
         } else {
 
-            String dateAndTime = new SimpleDateFormat("dd.MM.yy hh:mm:ss",Locale.ENGLISH).format(new Date());
+            String dateAndTime = new SimpleDateFormat("dd.MM.yy hh:mm", Locale.ENGLISH).format(new Date());
 
             Bundle bundle = new Bundle();
             bundle.putString("date_time", dateAndTime);
-            bundle.putString("agent_code", sharedPreferences.getString(AppConstants.USER_CODE,""));
+            bundle.putString("agent_code", sharedPreferences.getString(AppConstants.USER_CODE, ""));
             bundle.putString("acc_type", selectedAccount.getType());
             bundle.putString("customer_name", selectedAccount.getName());
             bundle.putString("acc_no", selectedAccount.getAccNo());
             bundle.putString("prev_balance", String.valueOf(prevAmount));
             bundle.putDouble("deposit_amount", depositAmount);
             bundle.putDouble("total_amount", totalAmount);
-            bundle.putParcelable("account",selectedAccount);
+            bundle.putParcelable("account", selectedAccount);
 
-            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_receiptFragment,bundle);
+            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_receiptFragment, bundle);
 
         }
     }
@@ -365,7 +348,7 @@ public class HomeFragment extends Fragment {
         selectedAccount = null;
     }
 
-    private void getCustomers(){
+    private void getCustomers() {
 
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
@@ -374,48 +357,14 @@ public class HomeFragment extends Fragment {
         collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                       Account account = document.toObject(Account.class);
-                       accountList.add(account);
+                        Account account = document.toObject(Account.class);
+                        accountList.add(account);
                     }
                     customerArrayAdapter.notifyDataSetChanged();
                 }
             }
         });
     }
-
-    private void saveTransaction(double depositAmount,double totalAmount){
-
-        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-
-        CollectionReference transactionCollectionReference = firebaseFirestore.collection(AppConstants.TRANSACTION_COLLECTION);
-        CollectionReference accountCollectionReference = firebaseFirestore.collection(AppConstants.ACCOUNT_COLLECTION);
-
-        String today = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH).format(new Date());
-
-        HashMap<String,Object> transactionMap = new HashMap<>();
-        transactionMap.put("accNo",selectedAccount.getAccNo());
-        transactionMap.put("code",sharedPreferences.getString(AppConstants.USER_CODE,""));
-        transactionMap.put("date",today);
-        transactionMap.put("depAmount",depositAmount);
-        transactionMap.put("name",selectedAccount.getName());
-        transactionMap.put("prevAmount",selectedAccount.getPrevAmount());
-
-        transactionCollectionReference.add(transactionMap);
-
-        HashMap<String,Object> accountMap = new HashMap<>();
-        accountMap.put("prevAmount",totalAmount);
-        accountCollectionReference.document(String.valueOf(selectedAccount.getId())).update(accountMap);
-    }
-
-    /*private void clearForm() {
-        editText.setText("PREV AMT: ");
-        accountTypeView.setText("ACC TYPE: ");
-        textView.setText("");
-        resultTextView.setText("");
-        autoCompleteTextView.setText("");
-        prevAmount = 0;
-    }*/
-
 }

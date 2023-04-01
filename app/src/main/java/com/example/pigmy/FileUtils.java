@@ -6,30 +6,25 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
 public class FileUtils {
 
-    protected static String createFile(String fileName){
+    protected static String createFile(String fileName) {
         File downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File file = new File(downloadPath,fileName);
+        File file = new File(downloadPath, fileName);
         return file.getAbsolutePath();
     }
 
-    protected boolean writeToFile(List<String> stringList){
+    protected boolean writeToFile(List<String> stringList) {
         boolean writeResult;
         try {
             File downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            File file = new File(downloadPath,"receive.txt");
+            File file = new File(downloadPath, "receive.txt");
             FileOutputStream fOut = new FileOutputStream(file);
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fOut));
             for (int i = 0; i < stringList.size(); i++) {
@@ -38,7 +33,7 @@ public class FileUtils {
             }
             bw.close();
             fOut.close();
-            writeResult=true;
+            writeResult = true;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -49,10 +44,9 @@ public class FileUtils {
         List<String> dataList = new ArrayList<>();
         try {
             File downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            FileInputStream fis=new FileInputStream(downloadPath +"/send.txt");
-            Scanner sc=new Scanner(fis);
-            while(sc.hasNextLine())
-            {
+            FileInputStream fis = new FileInputStream(downloadPath + "/send.txt");
+            Scanner sc = new Scanner(fis);
+            while (sc.hasNextLine()) {
                 dataList.add(sc.nextLine());
             }
             sc.close();
