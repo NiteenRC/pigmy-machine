@@ -1,34 +1,33 @@
 {
   "project_info": {
-    "project_number": "460281458559",
-    "firebase_url": "https://spring-firebase-9c774-default-rtdb.firebaseio.com",
-    "project_id": "spring-firebase-9c774",
-    "storage_bucket": "spring-firebase-9c774.appspot.com"
+    "project_number": "581229851571",
+    "project_id": "fir-test-d25f1",
+    "storage_bucket": "fir-test-d25f1.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:460281458559:android:0e0dbaa744483a02e8b44a",
+        "mobilesdk_app_id": "1:581229851571:android:672882e496183c83a911c6",
         "android_client_info": {
           "package_name": "com.example.pigmy"
         }
       },
       "oauth_client": [
         {
-          "client_id": "460281458559-0d9nbctfrtki999alkh7riec1ruogui6.apps.googleusercontent.com",
+          "client_id": "581229851571-1komjs88iokpnp1otpf47m1rur7t5pkh.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBPGJu5Zhx8jAK6s0z_e4ob_-QbiL8B5c4"
+          "current_key": "AIzaSyBjprzcXpnwLS9YgUnLbmkZzB015zeJ8EU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "460281458559-0d9nbctfrtki999alkh7riec1ruogui6.apps.googleusercontent.com",
+              "client_id": "581229851571-1komjs88iokpnp1otpf47m1rur7t5pkh.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
