@@ -4,6 +4,7 @@ import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.text.TextUtils.isDigitsOnly;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,13 +16,16 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -34,6 +38,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
+import androidx.navigation.Navigator;
 
 import com.example.pigmy.databinding.FragmentHomeBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -86,8 +91,7 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         askPermission();
@@ -121,14 +125,19 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        initGUI();
-
-        getCustomers();
+//        initGUI();
 
         binding.btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ShowToast")
             @Override
             public void onClick(View view) {
-                saveRecord(view);
+                if (Double.parseDouble(binding.tvTotalAmount.getText().toString()) >= 0 ) {
+                    saveRecord(view);
+                } else {
+                    Toast toast = Toast.makeText(getContext(), "enter valid amount", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
             }
         });
 
@@ -144,6 +153,7 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void onChanged(Object o) {
                         clearForm();
+                        initGUI();
                     }
                 });
     }
@@ -152,8 +162,10 @@ public class HomeFragment extends Fragment {
 
         accountList = new ArrayList<>();
 
-        binding.tvPrevAmount.setText("PREV AMT: ");
-        binding.tvAccountType.setText("ACC TYPE: ");
+        getCustomers();
+
+        binding.tvPrevAmount.setText("");
+        binding.tvAccountType.setText("");
 
        /* dataList = new FileUtils().readDataExternal();
         for (String item : dataList) {
@@ -164,8 +176,14 @@ public class HomeFragment extends Fragment {
 
         customerArrayAdapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_dropdown_item_1line, accountList);
         binding.avNameAccNo.setAdapter(customerArrayAdapter);
-        binding.avNameAccNo.setThreshold(0);
-
+        binding.avNameAccNo.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event){
+                binding.avNameAccNo.showDropDown();
+                return false;
+            }
+        });
+        binding.avNameAccNo.requestFocus();
         resetAccTypeAndPrevAmt(binding.avNameAccNo);
         onTextChangedForAccountSelection(binding.avNameAccNo);
         onTextChangedForDepositAmt(binding.tvTotalAmount, binding.tvAmount);
@@ -198,7 +216,7 @@ public class HomeFragment extends Fragment {
             bundle.putParcelable("account", selectedAccount);
 
             Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_receiptFragment, bundle);
-
+            ReceiptFragment.newInstance();
         }
     }
 
@@ -278,9 +296,10 @@ public class HomeFragment extends Fragment {
     private void onTextChangedForAccountSelection(AutoCompleteTextView autoCompleteTextView) {
         autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
             selectedAccount = (Account) parent.getItemAtPosition(position);
-            binding.tvAccountType.setText("ACC TYPE: " + selectedAccount.getType());
+            binding.tvAccountType.setText("" + selectedAccount.getType());
+            binding.tvAccountType.setFocusable(false);
             prevAmount = selectedAccount.getPrevAmount();
-            binding.tvPrevAmount.setText("PREV AMT: " + selectedAccount.getPrevAmount());
+            binding.tvPrevAmount.setText("" + selectedAccount.getPrevAmount());
             binding.tvPrevAmount.setFocusable(false);
             binding.tvTotalAmount.setText("");
             binding.tvAmount.setText("");
@@ -324,8 +343,8 @@ public class HomeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() == 0) {
-                    binding.tvPrevAmount.setText("PREV AMT: ");
-                    binding.tvAccountType.setText("ACC TYPE: ");
+                    binding.tvPrevAmount.setText("");
+                    binding.tvAccountType.setText("");
                     binding.tvTotalAmount.setText("");
                     binding.tvAmount.setText("");
                     prevAmount = 0;
@@ -339,8 +358,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void clearForm() {
-        binding.tvPrevAmount.setText("PREV AMT: ");
-        binding.tvAccountType.setText("ACC TYPE: ");
+        binding.tvPrevAmount.setText("");
+        binding.tvAccountType.setText("");
         binding.tvTotalAmount.setText("");
         binding.tvAmount.setText("");
         binding.avNameAccNo.setText("");

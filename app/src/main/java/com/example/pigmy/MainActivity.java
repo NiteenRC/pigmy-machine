@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setOpenableLayout(binding.drawerLayout)
                 .build();
 
-        NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration);
+//        NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
         navView.setNavigationItemSelectedListener(this);

@@ -3,6 +3,7 @@ package com.example.pigmy;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -128,6 +129,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                         } else {
                             Toast.makeText(requireActivity(), "Error in connecting to database", Toast.LENGTH_LONG).show();
                         }
+                        Log.e("TAG", "onComplete: "+task.toString());
                         binding.progressBar.setVisibility(View.INVISIBLE);
                         binding.btnLogin.setEnabled(true);
                     }
