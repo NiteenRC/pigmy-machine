@@ -1,0 +1,17 @@
+
+C
+java:S1604m"(Make this anonymous inner class a lambda(Ä¿ßÉûÿÿÿÿ
+{
+java:S1488*"`Immediately return this expression instead of assigning it to the temporary variable "fragment".(‘ô²„úÿÿÿÿ
+l
+java:S1450 "VRemove the "mParam1" field and declare it as a local variable in the relevant methods.(•Íï‘
+l
+java:S1450!"VRemove the "mParam2" field and declare it as a local variable in the relevant methods.(¡ˆ€ 
+Q	java:S125+"<This block of commented-out lines of code should be removed.(Ã£²Ï
+Q	java:S125Z"<This block of commented-out lines of code should be removed.(Ø®½¬
+R
+java:S1874d"5Remove this use of "getParcelable"; it is deprecated.(ëáÛ†8æŠ­ö0
+A
+java:S1068 "+Remove this unused "mParam1" private field.(•Íï‘
+A
+java:S1068!"+Remove this unused "mParam2" private field.(¡ˆ€ 

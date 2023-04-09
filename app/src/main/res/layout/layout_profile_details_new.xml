@@ -47,21 +47,43 @@
         app:layout_constraintTop_toBottomOf="@id/tvPersonCode" />
 
     <TextView
+        android:id="@+id/transactionHistory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
+        android:layout_marginStart="20dp"
+        android:fontFamily="@font/open_sans_semibold"
+        android:drawablePadding="16dp"
+        android:text="Transaction History"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view2"
+        app:drawableStartCompat="@drawable/ic_history_24" />
+
+    <View
+        android:id="@+id/view3"
+        android:layout_width="match_parent"
+        android:layout_height="0.7dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/transactionHistory" />
+
+    <TextView
         android:id="@+id/tvSignOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="20dp"
         android:layout_marginStart="20dp"
         android:drawableStart="@drawable/baseline_logout_24"
-        android:drawablePadding="16dp"
         android:fontFamily="@font/open_sans_semibold"
+        android:drawablePadding="16dp"
         android:text="Sign Out"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view2" />
+        app:layout_constraintTop_toBottomOf="@id/view3" />
 
     <View
-        android:id="@+id/view3"
+        android:id="@+id/view4"
         android:layout_width="match_parent"
         android:layout_height="0.7dp"
         android:layout_marginTop="20dp"
@@ -80,6 +102,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view3" />
+        app:layout_constraintTop_toBottomOf="@id/view4" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

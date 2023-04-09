@@ -2,7 +2,8 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph.xml">
+    android:id="@+id/nav_graph.xml"
+    app:startDestination="@id/transactionHistoryFragment">
 
     <fragment
         android:id="@+id/loginFragment"
@@ -22,7 +23,8 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.pigmy.HomeFragment"
-        android:label="@string/app_name">
+        android:label="@string/app_name"
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_receiptFragment"
             app:destination="@id/receiptFragment"
@@ -37,10 +39,22 @@
             app:popExitAnim="@anim/animate_slide_out_right"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_homeFragment_to_transactionHistoryFragment"
+            app:destination="@id/transactionHistoryFragment" />
     </fragment>
     <dialog
         android:id="@+id/receiptFragment"
         android:name="com.example.pigmy.ReceiptFragment"
         android:label="Receipt Details"
         tools:layout="@layout/fragment_receipt" />
+    <fragment
+        android:id="@+id/transactionHistoryFragment"
+        android:name="com.example.pigmy.TransactionHistoryFragment"
+        android:label="TransactionHistoryFragment"
+        tools:layout="@layout/fragment_transaction">
+        <action
+            android:id="@+id/action_transactionHistoryFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
 </navigation>

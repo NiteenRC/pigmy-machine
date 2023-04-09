@@ -16,6 +16,7 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -373,16 +374,15 @@ public class HomeFragment extends Fragment {
 
         CollectionReference collectionReference = firebaseFirestore.collection(AppConstants.ACCOUNT_COLLECTION);
 
-        collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Account account = document.toObject(Account.class);
-                        accountList.add(account);
-                    }
-                    customerArrayAdapter.notifyDataSetChanged();
+        collectionReference.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                accountList.clear();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    Log.d("Testing", "onComplete: " + document.getData());
+                    Account account = document.toObject(Account.class);
+                    accountList.add(account);
                 }
+                customerArrayAdapter.notifyDataSetChanged();
             }
         });
     }
