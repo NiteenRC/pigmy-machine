@@ -5,10 +5,13 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.text.TextUtils.isDigitsOnly;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,8 +24,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +44,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
 import androidx.navigation.Navigator;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.pigmy.databinding.FragmentHomeBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -161,7 +167,6 @@ public class HomeFragment extends Fragment {
     private void initGUI() {
 
         accountList = new ArrayList<>();
-
         getCustomers();
 
         binding.tvPrevAmount.setText("");
@@ -204,20 +209,89 @@ public class HomeFragment extends Fragment {
 
             String dateAndTime = new SimpleDateFormat("dd.MM.yy hh:mm", Locale.ENGLISH).format(new Date());
 
-            Bundle bundle = new Bundle();
-            bundle.putString("date_time", dateAndTime);
-            bundle.putString("agent_code", sharedPreferences.getString(AppConstants.USER_CODE, ""));
-            bundle.putString("acc_type", selectedAccount.getType());
-            bundle.putString("customer_name", selectedAccount.getName());
-            bundle.putString("acc_no", selectedAccount.getAccNo());
-            bundle.putString("prev_balance", String.valueOf(prevAmount));
-            bundle.putDouble("deposit_amount", depositAmount);
-            bundle.putDouble("total_amount", totalAmount);
-            bundle.putParcelable("account", selectedAccount);
+//            Bundle bundle = new Bundle();
+//            bundle.putString("date_time", dateAndTime);
+//            bundle.putString("agent_code", sharedPreferences.getString(AppConstants.USER_CODE, ""));
+//            bundle.putString("acc_type", selectedAccount.getType());
+//            bundle.putString("customer_name", selectedAccount.getName());
+//            bundle.putString("acc_no", selectedAccount.getAccNo());
+//            bundle.putString("prev_balance", String.valueOf(prevAmount));
+//            bundle.putDouble("deposit_amount", depositAmount);
+//            bundle.putDouble("total_amount", totalAmount);
+//            bundle.putParcelable("account", selectedAccount);
+//
+//            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_receiptFragment, bundle);
+            Dialog dialog = new Dialog(getActivity());
+            dialog.setContentView(R.layout.fragment_receipt);
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
-            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_receiptFragment, bundle);
-            ReceiptFragment.newInstance();
+            Button cancel_button = dialog.findViewById(R.id.cancel_button);
+            Button confirm_button = dialog.findViewById(R.id.confirm_button);
+            cancel_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                    clearForm();
+                    initGUI();
+                }
+            });
+
+            TextView date_time = dialog.findViewById(R.id.date_time);
+            TextView agent_code = dialog.findViewById(R.id.agent_code);
+            TextView acc_type = dialog.findViewById(R.id.acc_type);
+            TextView customer_name = dialog.findViewById(R.id.customer_name);
+            TextView acc_no = dialog.findViewById(R.id.acc_no);
+            TextView prev_balance = dialog.findViewById(R.id.prev_balance);
+            TextView deposit_amount = dialog.findViewById(R.id.deposit_amount);
+            TextView total_amount = dialog.findViewById(R.id.total_amount);
+
+            date_time.setText("Date  : " +dateAndTime);
+            agent_code.setText("Code  : " +sharedPreferences.getString(AppConstants.USER_CODE, ""));
+            acc_type.setText("Type  : " +selectedAccount.getType());
+            customer_name.setText("Name  : " +selectedAccount.getName());
+            acc_no.setText("Acc No  : " +selectedAccount.getAccNo());
+            prev_balance.setText("Previous  : " +String.valueOf(prevAmount));
+            deposit_amount.setText("Deposit  : " +depositAmount);
+            total_amount.setText("Total  : " +totalAmount);
+
+            confirm_button.setOnClickListener(view1 -> {
+                dialog.dismiss();
+                saveTransaction(depositAmount, totalAmount, selectedAccount);
+                Toast.makeText(requireActivity(), "Saved Successfully", Toast.LENGTH_LONG).show();
+                clearForm();
+                initGUI();
+//                NavHostFragment.findNavController(this).getPreviousBackStackEntry().getSavedStateHandle().set("key", "clear");
+            });
+
+            dialog.show();
         }
+    }
+    private void saveTransaction(double depositAmount, double totalAmount, Account selectedAccount) {
+
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
+        CollectionReference transactionCollectionReference = firebaseFirestore.collection(AppConstants.TRANSACTION_COLLECTION);
+        CollectionReference accountCollectionReference = firebaseFirestore.collection(AppConstants.ACCOUNT_COLLECTION);
+
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(new Date());
+
+        HashMap<String, Object> transactionMap = new HashMap<>();
+        transactionMap.put("accNo", selectedAccount.getAccNo());
+        transactionMap.put("accType", selectedAccount.getType());
+        transactionMap.put("code", sharedPreferences.getString(AppConstants.USER_CODE, ""));
+        transactionMap.put("agentName", sharedPreferences.getString(AppConstants.USER_NAME, ""));
+        transactionMap.put("date", today);
+        transactionMap.put("depAmount", depositAmount);
+        transactionMap.put("name", selectedAccount.getName());
+        transactionMap.put("prevAmount", selectedAccount.getPrevAmount());
+
+        transactionCollectionReference.add(transactionMap);
+
+        HashMap<String, Object> accountMap = new HashMap<>();
+        accountMap.put("prevAmount", totalAmount);
+        accountCollectionReference.document(String.valueOf(selectedAccount.getId())).update(accountMap);
     }
 
     /* private void saveRecord(View view) {

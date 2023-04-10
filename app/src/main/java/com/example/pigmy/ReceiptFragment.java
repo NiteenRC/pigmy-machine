@@ -61,13 +61,13 @@ public class ReceiptFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = FragmentReceiptBinding.inflate(inflater, container, false);
-        // Set transparent background and no title
         if (getDialog() != null && getDialog().getWindow() != null) {
             getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         }
+        binding = FragmentReceiptBinding.inflate(inflater, container, false);
+        // Set transparent background and no title
         return binding.getRoot();
     }
 
