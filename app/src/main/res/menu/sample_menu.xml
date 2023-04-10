@@ -4,6 +4,12 @@
         android:id="@+id/profile"
         android:icon="@drawable/baseline_person_pin_"
         android:title="Profile" />
+
+    <item
+        android:id="@+id/transaction"
+        android:icon="@drawable/ic_history_24"
+        android:title="Transaction" />
+
     <item
         android:id="@+id/logout"
         android:icon="@drawable/baseline_logout_24"

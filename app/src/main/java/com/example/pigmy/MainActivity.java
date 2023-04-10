@@ -96,11 +96,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         navController.setGraph(navGraph);
 
         NavigationView navView = findViewById(R.id.nav_view);
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration
-                .Builder(R.id.homeFragment)
-                .setOpenableLayout(binding.drawerLayout)
-                .build();
-
+//        AppBarConfiguration appBarConfiguration = new AppBarConfiguration
+//                .Builder(R.id.homeFragment)
+//                .setOpenableLayout(binding.drawerLayout)
+//                .build();
+//
 //        NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
@@ -133,6 +133,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
+                binding.transactionHistory.setOnClickListener(v -> {
+                    navigateToTransactionHistory();
+                    popupWindow.dismiss();
+                });
+
                 popupWindow.showAsDropDown(view, -40, 28);
 
             }
@@ -141,6 +146,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
             public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
+                if (navDestination.getId() == R.id.transactionHistoryFragment) {
+                    binding.title.setText(getString(R.string.transaction_history_fragment_title));
+                }
                 if (navDestination.getId() == R.id.loginFragment) {
                     toolbar.setVisibility(View.GONE);
                     binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -368,6 +376,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         builder.create().show();
+    }
+
+    private void navigateToTransactionHistory() {
+        navController.navigate(R.id.action_homeFragment_to_transactionHistoryFragment);
     }
 
     /*private void saveRecord() {
