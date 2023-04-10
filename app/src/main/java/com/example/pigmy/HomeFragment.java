@@ -98,6 +98,13 @@ public class HomeFragment extends Fragment {
         return binding.getRoot();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        clearForm();
+        askPermission();
+    }
+
     private void askPermission() {
         //checking external storage permission is given or not...
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

@@ -22,7 +22,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Cust Name:"
+        android:text="Cust Name"
         android:textAppearance="?attr/textAppearanceHeadline6"
         app:layout_constraintEnd_toStartOf="@id/centerDivider"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +39,7 @@
         app:layout_constraintTop_toBottomOf="@id/nameLabel"
         tools:text="name" />
 
-    <TextView
+    <!-- <TextView
         android:id="@+id/accountTypeLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -59,18 +59,18 @@
         app:layout_constraintEnd_toStartOf="@id/centerDivider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/accountTypeLabel"
-        tools:text="accountType" />
+        tools:text="accountType" /> -->
 
     <TextView
         android:id="@+id/depositLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Deposit:"
+        android:text="Deposit"
         android:textAppearance="?attr/textAppearanceHeadline6"
         app:layout_constraintEnd_toStartOf="@id/centerDivider"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/accountType" />
+        app:layout_constraintTop_toBottomOf="@id/name" />
 
     <TextView
         android:id="@+id/depositAmount"
@@ -102,7 +102,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Acc No:"
+        android:text="@string/acc_no_type"
         android:textAppearance="?attr/textAppearanceHeadline6"
         app:layout_constraintEnd_toStartOf="@id/divider"
         app:layout_constraintStart_toEndOf="@id/centerDivider"
@@ -119,7 +119,7 @@
         app:layout_constraintTop_toBottomOf="@id/accNoLabel"
         tools:text="name" />
 
-    <TextView
+    <!--<TextView
         android:id="@+id/agentNameLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -127,8 +127,7 @@
         android:text="Agent Name:"
         android:textAppearance="?attr/textAppearanceHeadline6"
         app:layout_constraintEnd_toStartOf="@id/divider"
-        app:layout_constraintStart_toEndOf="@id/centerDivider"
-        app:layout_constraintTop_toBottomOf="@id/accNo" />
+        app:layout_constraintStart_toEndOf="@id/centerDivider" />
 
     <TextView
         android:id="@+id/agentName"
@@ -139,18 +138,18 @@
         app:layout_constraintEnd_toStartOf="@id/divider"
         app:layout_constraintStart_toEndOf="@id/centerDivider"
         app:layout_constraintTop_toBottomOf="@id/agentNameLabel"
-        tools:text="accountType" />
+        tools:text="accountType" /> -->
 
     <TextView
         android:id="@+id/prevAmountLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Prev Amount:"
+        android:text="Prev Amount"
         android:textAppearance="?attr/textAppearanceHeadline6"
         app:layout_constraintEnd_toStartOf="@id/divider"
         app:layout_constraintStart_toEndOf="@id/centerDivider"
-        app:layout_constraintTop_toBottomOf="@id/accountType" />
+        app:layout_constraintTop_toBottomOf="@id/accNo" />
 
     <TextView
         android:id="@+id/prevAmount"

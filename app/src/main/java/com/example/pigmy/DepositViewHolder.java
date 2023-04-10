@@ -23,12 +23,12 @@ public class DepositViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(DepositDetails item, HistoryClickListener listener) {
-        mBinding.date.setText(item.date);
+        mBinding.date.setText(item.date + "(" + item.agentName + ")");
         mBinding.depositAmount.setText(item.depAmount.toString());
-        mBinding.accountType.setText(item.accType);
+        //mBinding.accountType.setText(item.accNo +" & "+item.accType);
         mBinding.name.setText(item.name);
-        mBinding.accNo.setText(item.accNo);
-        mBinding.agentName.setText(item.agentName);
+        mBinding.accNo.setText(item.accNo + "(" + item.accType + ")");
+        //mBinding.agentName.setText(item.agentName);
         mBinding.prevAmount.setText(item.prevAmount.toString());
         mBinding.container.setOnClickListener(v -> listener.onHistoryClick(item));
     }
