@@ -9,7 +9,7 @@ import com.example.pigmy.databinding.TransactionHistoryItemBinding;
 
 public class DepositViewHolder extends RecyclerView.ViewHolder {
 
-    private TransactionHistoryItemBinding mBinding;
+    private final TransactionHistoryItemBinding mBinding;
 
     public DepositViewHolder(TransactionHistoryItemBinding binding) {
         super(binding.getRoot());
@@ -23,7 +23,7 @@ public class DepositViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(DepositDetails item, HistoryClickListener listener) {
-        mBinding.date.setText(item.date + "(" + item.agentName + ")");
+        mBinding.date.setText(item.date + "(" + item.totalAgentCollection + ")");
         mBinding.depositAmount.setText(item.depAmount.toString());
         //mBinding.accountType.setText(item.accNo +" & "+item.accType);
         mBinding.name.setText(item.name);

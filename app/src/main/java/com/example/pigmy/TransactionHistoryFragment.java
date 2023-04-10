@@ -2,6 +2,7 @@ package com.example.pigmy;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,19 +25,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class TransactionHistoryFragment extends Fragment {
-
+    private final ArrayList<DepositDetails> depositList = new ArrayList<>();
+    private final FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private FragmentTransactionBinding mBinding;
-    private ArrayList<DepositDetails> depositList = new ArrayList();
-    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private SharedPreferences preferences = null;
 
     @Nullable
     @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater,
-            @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState
-    ) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentTransactionBinding.inflate(inflater, container, false);
         preferences = requireActivity().getSharedPreferences(AppConstants.USER_SHARED_PREFERENCES, Context.MODE_PRIVATE);
         return mBinding.getRoot();
@@ -46,24 +42,7 @@ public class TransactionHistoryFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getTransactions();
-    }    private TransactionHistoryAdapter transactionHistoryAdapter = new TransactionHistoryAdapter(
-            new DiffUtil.ItemCallback<DepositDetails>() {
-                @Override
-                public boolean areItemsTheSame(@NonNull DepositDetails oldItem, @NonNull DepositDetails newItem) {
-                    return oldItem == newItem;
-                }
-
-                @Override
-                public boolean areContentsTheSame(@NonNull DepositDetails oldItem, @NonNull DepositDetails newItem) {
-                    return oldItem.key.equals(newItem.key);
-                }
-            }, depositDetails -> {
-        firebaseFirestore.collection(AppConstants.TRANSACTION_COLLECTION)
-                .document(String.valueOf(depositDetails.key))
-                .delete()
-                .addOnSuccessListener(unused -> getTransactions())
-                .addOnFailureListener(e -> Toast.makeText(requireContext(), "something went wrong.", Toast.LENGTH_LONG).show());
-    });
+    }
 
     private void getTransactions() {
         CollectionReference collectionReference = firebaseFirestore.collection(AppConstants.TRANSACTION_COLLECTION);
@@ -82,19 +61,42 @@ public class TransactionHistoryFragment extends Fragment {
                     String accType = document.getString("accType");
                     Double depAmount = document.getDouble("depAmount");
                     String key = document.getId();
-                    depositList.add(new DepositDetails(date, name, depAmount, accType, code, accNo, agentName, prevAmount, key));
+                    depositList.add(new DepositDetails(date, name, depAmount, accType, code, accNo, agentName, prevAmount, key, 0));
                 }
-                Log.d("Testing", "getCustomers: " + depositList.toString());
+                Log.d("Testing", "getCustomers: " + depositList);
                 Log.d("Testing", "getCustomers: " + depositList.size());
 
-                Collections.sort(depositList);
+                ArrayList<DepositDetails> depositList1 = new ArrayList<>();
+                double totalAgentCollection;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    totalAgentCollection = depositList.stream().mapToDouble(x -> x.depAmount).sum();
+                    for(DepositDetails depositDetails : depositList){
+                        depositDetails.totalAgentCollection = totalAgentCollection;
+                        depositList1.add(depositDetails);
+                    }
+                }
+
+                Collections.sort(depositList1);
                 mBinding.transactionHistoryRv.setAdapter(transactionHistoryAdapter);
-                transactionHistoryAdapter.submitList(depositList);
+                transactionHistoryAdapter.submitList(depositList1);
             }
         });
     }
 
+    private final TransactionHistoryAdapter transactionHistoryAdapter = new TransactionHistoryAdapter(
+            new DiffUtil.ItemCallback<DepositDetails>() {
+                @Override
+                public boolean areItemsTheSame(@NonNull DepositDetails oldItem, @NonNull DepositDetails newItem) {
+                    return oldItem == newItem;
+                }
 
-
-
+                @Override
+                public boolean areContentsTheSame(@NonNull DepositDetails oldItem, @NonNull DepositDetails newItem) {
+                    return oldItem.key.equals(newItem.key);
+                }
+            }, depositDetails -> firebaseFirestore.collection(AppConstants.TRANSACTION_COLLECTION)
+            .document(String.valueOf(depositDetails.key))
+            .delete()
+            .addOnSuccessListener(unused -> getTransactions())
+            .addOnFailureListener(e -> Toast.makeText(requireContext(), "something went wrong.", Toast.LENGTH_LONG).show()));
 }

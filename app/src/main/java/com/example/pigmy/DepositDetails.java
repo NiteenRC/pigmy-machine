@@ -12,6 +12,7 @@ public class DepositDetails implements Comparable<DepositDetails> {
     final String agentName;
     final Double prevAmount;
     final String key;
+    double totalAgentCollection;
 
     public DepositDetails(String date,
                           String name,
@@ -21,8 +22,8 @@ public class DepositDetails implements Comparable<DepositDetails> {
                           String accNo,
                           String agentName,
                           Double prevAmount,
-                          String key
-    ) {
+                          String key,
+                          double totalAgentCollection) {
         this.date = date;
         this.name = name;
         this.accType = accountType;
@@ -32,6 +33,7 @@ public class DepositDetails implements Comparable<DepositDetails> {
         this.agentName = agentName;
         this.prevAmount = prevAmount;
         this.key = key;
+        this.totalAgentCollection = totalAgentCollection;
     }
 
     @NonNull
