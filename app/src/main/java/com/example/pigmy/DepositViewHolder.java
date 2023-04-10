@@ -1,7 +1,6 @@
 package com.example.pigmy;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,6 +10,7 @@ import com.example.pigmy.databinding.TransactionHistoryItemBinding;
 public class DepositViewHolder extends RecyclerView.ViewHolder {
 
     private TransactionHistoryItemBinding mBinding;
+
     public DepositViewHolder(TransactionHistoryItemBinding binding) {
         super(binding.getRoot());
         mBinding = binding;

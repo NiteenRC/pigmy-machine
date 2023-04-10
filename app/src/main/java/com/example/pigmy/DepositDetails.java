@@ -2,7 +2,7 @@ package com.example.pigmy;
 
 import androidx.annotation.NonNull;
 
-public class DepositDetails {
+public class DepositDetails implements Comparable<DepositDetails> {
     final String date;
     final String name;
     final Double depAmount;
@@ -45,9 +45,13 @@ public class DepositDetails {
                 "code = " + code +
                 "accNo = " + accNo +
                 "agentName = " + agentName +
-                "prevAmount = " + prevAmount+
-                "key = " + key+
+                "prevAmount = " + prevAmount +
+                "key = " + key +
                 "}";
     }
 
+    @Override
+    public int compareTo(DepositDetails depositDetails) {
+        return depositDetails.date.compareTo(this.date);
+    }
 }

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter;
 public class TransactionHistoryAdapter extends ListAdapter<DepositDetails, DepositViewHolder> {
 
     private final HistoryClickListener listener;
+
     protected TransactionHistoryAdapter(@NonNull DiffUtil.ItemCallback<DepositDetails> diffCallback, HistoryClickListener listener) {
         super(diffCallback);
         this.listener = listener;
@@ -24,10 +25,6 @@ public class TransactionHistoryAdapter extends ListAdapter<DepositDetails, Depos
     public void onBindViewHolder(@NonNull DepositViewHolder holder, int position) {
         holder.bind(getItem(position), listener);
     }
-}
-
-interface HistoryClickListener {
-    void onHistoryClick(DepositDetails depositDetails);
 }
 
 

@@ -22,10 +22,8 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -44,16 +42,11 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
-import androidx.navigation.Navigator;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.pigmy.databinding.FragmentHomeBinding;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -66,12 +59,12 @@ import java.util.Map;
 public class HomeFragment extends Fragment {
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
     private final Map<String, String> map = new HashMap<>();
+    private final List<String> dataList = new ArrayList<>();
     // TODO: Rename and change types of parameters
     private FragmentHomeBinding binding;
     private SharedPreferences sharedPreferences;
     private double totalAmount, prevAmount, depositAmount;
     private int receiptNo;
-    private final List<String> dataList = new ArrayList<>();
     private List<Account> accountList;
     private ArrayAdapter<Account> customerArrayAdapter;
     private Account selectedAccount;
@@ -138,7 +131,7 @@ public class HomeFragment extends Fragment {
             @SuppressLint("ShowToast")
             @Override
             public void onClick(View view) {
-                if (Double.parseDouble(binding.tvTotalAmount.getText().toString()) >= 0 ) {
+                if (Double.parseDouble(binding.tvTotalAmount.getText().toString()) >= 0) {
                     saveRecord(view);
                 } else {
                     Toast toast = Toast.makeText(getContext(), "enter valid amount", Toast.LENGTH_LONG);
@@ -182,12 +175,9 @@ public class HomeFragment extends Fragment {
 
         customerArrayAdapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_dropdown_item_1line, accountList);
         binding.avNameAccNo.setAdapter(customerArrayAdapter);
-        binding.avNameAccNo.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event){
-                binding.avNameAccNo.showDropDown();
-                return false;
-            }
+        binding.avNameAccNo.setOnTouchListener((v, event) -> {
+            binding.avNameAccNo.showDropDown();
+            return false;
         });
         binding.avNameAccNo.requestFocus();
         resetAccTypeAndPrevAmt(binding.avNameAccNo);
@@ -208,7 +198,7 @@ public class HomeFragment extends Fragment {
             binding.tvAmount.setError("FIELD CANNOT BE EMPTY");
         } else {
 
-            String dateAndTime = new SimpleDateFormat("dd.MM.yy hh:mm", Locale.ENGLISH).format(new Date());
+            String dateAndTime = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH).format(new Date());
 
 //            Bundle bundle = new Bundle();
 //            bundle.putString("date_time", dateAndTime);
@@ -248,14 +238,14 @@ public class HomeFragment extends Fragment {
             TextView deposit_amount = dialog.findViewById(R.id.deposit_amount);
             TextView total_amount = dialog.findViewById(R.id.total_amount);
 
-            date_time.setText("Date  : " +dateAndTime);
-            agent_code.setText("Code  : " +sharedPreferences.getString(AppConstants.USER_CODE, ""));
-            acc_type.setText("Type  : " +selectedAccount.getType());
-            customer_name.setText("Name  : " +selectedAccount.getName());
-            acc_no.setText("Acc No  : " +selectedAccount.getAccNo());
-            prev_balance.setText("Previous  : " +String.valueOf(prevAmount));
-            deposit_amount.setText("Deposit  : " +depositAmount);
-            total_amount.setText("Total  : " +totalAmount);
+            date_time.setText("Date  : " + dateAndTime);
+            agent_code.setText("Code  : " + sharedPreferences.getString(AppConstants.USER_CODE, ""));
+            acc_type.setText("Type  : " + selectedAccount.getType());
+            customer_name.setText("Name  : " + selectedAccount.getName());
+            acc_no.setText("Acc No  : " + selectedAccount.getAccNo());
+            prev_balance.setText("Previous  : " + String.valueOf(prevAmount));
+            deposit_amount.setText("Deposit  : " + depositAmount);
+            total_amount.setText("Total  : " + totalAmount);
 
             confirm_button.setOnClickListener(view1 -> {
                 dialog.dismiss();
@@ -269,6 +259,7 @@ public class HomeFragment extends Fragment {
             dialog.show();
         }
     }
+
     private void saveTransaction(double depositAmount, double totalAmount, Account selectedAccount) {
 
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
@@ -276,7 +267,7 @@ public class HomeFragment extends Fragment {
         CollectionReference transactionCollectionReference = firebaseFirestore.collection(AppConstants.TRANSACTION_COLLECTION);
         CollectionReference accountCollectionReference = firebaseFirestore.collection(AppConstants.ACCOUNT_COLLECTION);
 
-        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(new Date());
+        String today = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH).format(new Date());
 
         HashMap<String, Object> transactionMap = new HashMap<>();
         transactionMap.put("accNo", selectedAccount.getAccNo());

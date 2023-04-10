@@ -21,6 +21,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class TransactionHistoryFragment extends Fragment {
 
@@ -28,25 +29,6 @@ public class TransactionHistoryFragment extends Fragment {
     private ArrayList<DepositDetails> depositList = new ArrayList();
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private SharedPreferences preferences = null;
-
-    private TransactionHistoryAdapter transactionHistoryAdapter = new TransactionHistoryAdapter(
-            new DiffUtil.ItemCallback<DepositDetails>() {
-                @Override
-                public boolean areItemsTheSame(@NonNull DepositDetails oldItem, @NonNull DepositDetails newItem) {
-                    return oldItem == newItem;
-                }
-
-                @Override
-                public boolean areContentsTheSame(@NonNull DepositDetails oldItem, @NonNull DepositDetails newItem) {
-                    return oldItem.key.equals(newItem.key);
-                }
-            }, depositDetails -> {
-        firebaseFirestore.collection(AppConstants.TRANSACTION_COLLECTION)
-                .document(String.valueOf(depositDetails.key))
-                .delete()
-                .addOnSuccessListener(unused -> getTransactions())
-                .addOnFailureListener(e -> Toast.makeText(requireContext(), "something went wrong.", Toast.LENGTH_LONG).show());
-    });
 
     @Nullable
     @Override
@@ -64,7 +46,24 @@ public class TransactionHistoryFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getTransactions();
-    }
+    }    private TransactionHistoryAdapter transactionHistoryAdapter = new TransactionHistoryAdapter(
+            new DiffUtil.ItemCallback<DepositDetails>() {
+                @Override
+                public boolean areItemsTheSame(@NonNull DepositDetails oldItem, @NonNull DepositDetails newItem) {
+                    return oldItem == newItem;
+                }
+
+                @Override
+                public boolean areContentsTheSame(@NonNull DepositDetails oldItem, @NonNull DepositDetails newItem) {
+                    return oldItem.key.equals(newItem.key);
+                }
+            }, depositDetails -> {
+        firebaseFirestore.collection(AppConstants.TRANSACTION_COLLECTION)
+                .document(String.valueOf(depositDetails.key))
+                .delete()
+                .addOnSuccessListener(unused -> getTransactions())
+                .addOnFailureListener(e -> Toast.makeText(requireContext(), "something went wrong.", Toast.LENGTH_LONG).show());
+    });
 
     private void getTransactions() {
         CollectionReference collectionReference = firebaseFirestore.collection(AppConstants.TRANSACTION_COLLECTION);
@@ -88,9 +87,14 @@ public class TransactionHistoryFragment extends Fragment {
                 Log.d("Testing", "getCustomers: " + depositList.toString());
                 Log.d("Testing", "getCustomers: " + depositList.size());
 
+                Collections.sort(depositList);
                 mBinding.transactionHistoryRv.setAdapter(transactionHistoryAdapter);
                 transactionHistoryAdapter.submitList(depositList);
             }
         });
     }
+
+
+
+
 }

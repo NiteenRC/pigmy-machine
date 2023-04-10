@@ -26,7 +26,6 @@ import androidx.navigation.NavDestination;
 import androidx.navigation.NavGraph;
 import androidx.navigation.NavInflater;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.pigmy.databinding.ActivityMainBinding;

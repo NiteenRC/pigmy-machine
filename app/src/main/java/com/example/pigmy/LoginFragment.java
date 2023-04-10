@@ -30,6 +30,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     private FragmentLoginBinding binding;
     private SharedPreferences sharedPreferences;
+
     public LoginFragment() {
         // Required empty public constructor
     }
@@ -129,7 +130,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                         } else {
                             Toast.makeText(requireActivity(), "Error in connecting to database", Toast.LENGTH_LONG).show();
                         }
-                        Log.e("TAG", "onComplete: "+task.toString());
+                        Log.e("TAG", "onComplete: " + task.toString());
                         binding.progressBar.setVisibility(View.INVISIBLE);
                         binding.btnLogin.setEnabled(true);
                     }
