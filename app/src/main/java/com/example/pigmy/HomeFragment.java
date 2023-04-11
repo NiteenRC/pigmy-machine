@@ -252,7 +252,7 @@ public class HomeFragment extends Fragment {
             acc_type.setText("Type  : " + selectedAccount.getType());
             customer_name.setText("Name  : " + selectedAccount.getName());
             acc_no.setText("Acc No  : " + selectedAccount.getAccNo());
-            prev_balance.setText("Previous  : " + String.valueOf(prevAmount));
+            prev_balance.setText("Previous  : " + prevAmount);
             deposit_amount.setText("Deposit  : " + depositAmount);
             total_amount.setText("Total  : " + totalAmount);
 
@@ -293,21 +293,23 @@ public class HomeFragment extends Fragment {
         HashMap<String, Object> accountMap = new HashMap<>();
         accountMap.put("prevAmount", totalAmount);
         accountCollectionReference.document(String.valueOf(selectedAccount.getId())).update(accountMap);
+
         StringBuilder builder = new StringBuilder();
-        builder.append("accNo: ").append(selectedAccount.getAccNo());
-//        builder.append("\ndate").append(today);
-        builder.append("\naccType: ").append(selectedAccount.getType());
-        builder.append("\nagentName: ").append(sharedPreferences.getString(AppConstants.USER_NAME, ""));
-        builder.append("\ndepAmount: ").append(depositAmount);
-        builder.append("\nprevAmount: ").append(selectedAccount.getPrevAmount());
-        Log.e("TAG", "saveTransaction: "+selectedAccount.getPhoneNumber());
+        builder.append("Date: ").append(today);
+        builder.append("\nAcc No: ").append(selectedAccount.getAccNo());
+        builder.append("\nAcc Type: ").append(selectedAccount.getType());
+        builder.append("\nAmount Paid: ").append(depositAmount);
+        builder.append("\nPrevious Amount: ").append(selectedAccount.getPrevAmount());
+        builder.append("\nTotal Amount: ").append(depositAmount + selectedAccount.getPrevAmount());
+        builder.append("\nAgent Name: ").append(sharedPreferences.getString(AppConstants.USER_NAME, ""));
+
         if (selectedAccount.getPhoneNumber() != null && !selectedAccount.getPhoneNumber().trim().isEmpty()) {
             try {
                 SmsManager smsManager = SmsManager.getDefault();
                 smsManager.sendTextMessage(selectedAccount.getPhoneNumber(), null, builder.toString(), null, null);
                 Toast.makeText(getActivity(), "Message Sent", Toast.LENGTH_LONG).show();
             } catch (Exception ex) {
-                Toast.makeText(getActivity(), ex.getMessage().toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), ex.getMessage(), Toast.LENGTH_LONG).show();
                 ex.printStackTrace();
             }
         }
