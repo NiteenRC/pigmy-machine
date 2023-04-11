@@ -18,7 +18,7 @@ public class Account implements Parcelable {
             return new Account[size];
         }
     };
-    private String name, type, plusMinus, accNo;
+    private String name, type, plusMinus, accNo, phoneNumber;
     private int id;
 
     private double prevAmount;
@@ -28,12 +28,21 @@ public class Account implements Parcelable {
 
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     protected Account(Parcel in) {
         name = in.readString();
         type = in.readString();
         plusMinus = in.readString();
         accNo = in.readString();
         id = in.readInt();
+        phoneNumber = in.readString();
         prevAmount = in.readDouble();
         act = in.readByte() != 0;
     }
@@ -111,6 +120,7 @@ public class Account implements Parcelable {
         parcel.writeString(type);
         parcel.writeString(plusMinus);
         parcel.writeString(accNo);
+        parcel.writeString(phoneNumber);
         parcel.writeInt(id);
         parcel.writeDouble(prevAmount);
         parcel.writeByte((byte) (act ? 1 : 0));

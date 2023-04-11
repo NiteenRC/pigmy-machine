@@ -30,6 +30,6 @@ public class DepositViewHolder extends RecyclerView.ViewHolder {
         mBinding.accNo.setText(item.accNo + "(" + item.accType + ")");
         //mBinding.agentName.setText(item.agentName);
         mBinding.prevAmount.setText(item.prevAmount.toString());
-        mBinding.container.setOnClickListener(v -> listener.onHistoryClick(item));
+//        mBinding.container.setOnClickListener(v -> listener.onHistoryClick(item));
     }
 }

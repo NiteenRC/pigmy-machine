@@ -1,6 +1,7 @@
 package com.example.pigmy;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.SEND_SMS;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.text.TextUtils.isDigitsOnly;
 
@@ -17,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -116,13 +118,13 @@ public class HomeFragment extends Fragment {
             } else {
                 initGUI();
             }
-        } else if (ContextCompat.checkSelfPermission(requireActivity(),
-                WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(requireActivity(),
-                    new String[]{WRITE_EXTERNAL_STORAGE,
-                            READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-        } else if (ContextCompat.checkSelfPermission(requireActivity(),
-                WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        } else if (ContextCompat.checkSelfPermission(requireActivity(), WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(requireActivity(), READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(requireActivity(), SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, SEND_SMS}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+        } else if (ContextCompat.checkSelfPermission(requireActivity(), WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(requireActivity(), READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(requireActivity(), SEND_SMS) == PackageManager.PERMISSION_GRANTED) {
             initGUI();
         }
     }
@@ -291,6 +293,24 @@ public class HomeFragment extends Fragment {
         HashMap<String, Object> accountMap = new HashMap<>();
         accountMap.put("prevAmount", totalAmount);
         accountCollectionReference.document(String.valueOf(selectedAccount.getId())).update(accountMap);
+        StringBuilder builder = new StringBuilder();
+        builder.append("accNo: ").append(selectedAccount.getAccNo());
+//        builder.append("\ndate").append(today);
+        builder.append("\naccType: ").append(selectedAccount.getType());
+        builder.append("\nagentName: ").append(sharedPreferences.getString(AppConstants.USER_NAME, ""));
+        builder.append("\ndepAmount: ").append(depositAmount);
+        builder.append("\nprevAmount: ").append(selectedAccount.getPrevAmount());
+        Log.e("TAG", "saveTransaction: "+selectedAccount.getPhoneNumber());
+        if (selectedAccount.getPhoneNumber() != null && !selectedAccount.getPhoneNumber().trim().isEmpty()) {
+            try {
+                SmsManager smsManager = SmsManager.getDefault();
+                smsManager.sendTextMessage(selectedAccount.getPhoneNumber(), null, builder.toString(), null, null);
+                Toast.makeText(getActivity(), "Message Sent", Toast.LENGTH_LONG).show();
+            } catch (Exception ex) {
+                Toast.makeText(getActivity(), ex.getMessage().toString(), Toast.LENGTH_LONG).show();
+                ex.printStackTrace();
+            }
+        }
     }
 
     /* private void saveRecord(View view) {
@@ -399,6 +419,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
+                binding.tvAmount.requestFocus();
             }
 
             @Override
