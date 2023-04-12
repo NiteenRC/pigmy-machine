@@ -59,7 +59,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class HomeFragment extends Fragment {
-    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
+
     private final Map<String, String> map = new HashMap<>();
     private final List<String> dataList = new ArrayList<>();
     // TODO: Rename and change types of parameters
@@ -96,7 +96,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(inflater, container, false);
-        askPermission();
+        initGUI();
         return binding.getRoot();
     }
 
@@ -104,33 +104,8 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         clearForm();
-        askPermission();
+        initGUI();
     }
-
-    private void askPermission() {
-        //checking external storage permission is given or not...
-        if (ContextCompat.checkSelfPermission(requireActivity(), WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(requireActivity(), READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(requireActivity(), SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, SEND_SMS}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-        } else if (ContextCompat.checkSelfPermission(requireActivity(), WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(requireActivity(), READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(requireActivity(), SEND_SMS) == PackageManager.PERMISSION_GRANTED) {
-            initGUI();
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                if (!Environment.isExternalStorageManager()) {
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                    Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
-                    intent.setData(uri);
-                    activityResultLauncher.launch(intent);
-                } else {
-                    initGUI();
-                }
-            }
-        }
-    }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -191,6 +166,7 @@ public class HomeFragment extends Fragment {
             return false;
         });
         binding.avNameAccNo.requestFocus();
+        binding.avNameAccNo.setThreshold(1);
         resetAccTypeAndPrevAmt(binding.avNameAccNo);
         onTextChangedForAccountSelection(binding.avNameAccNo);
         onTextChangedForDepositAmt(binding.tvTotalAmount, binding.tvAmount);
@@ -254,7 +230,7 @@ public class HomeFragment extends Fragment {
             acc_type.setText("Type  : " + selectedAccount.getType());
             customer_name.setText("Name  : " + selectedAccount.getName());
             acc_no.setText("Acc No  : " + selectedAccount.getAccNo());
-            prev_balance.setText("Previous  : " + prevAmount);
+            prev_balance.setText("Previous  : " + String.valueOf(prevAmount));
             deposit_amount.setText("Deposit  : " + depositAmount);
             total_amount.setText("Total  : " + totalAmount);
 
