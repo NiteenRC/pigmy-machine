@@ -109,16 +109,7 @@ public class HomeFragment extends Fragment {
 
     private void askPermission() {
         //checking external storage permission is given or not...
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
-                intent.setData(uri);
-                activityResultLauncher.launch(intent);
-            } else {
-                initGUI();
-            }
-        } else if (ContextCompat.checkSelfPermission(requireActivity(), WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
+        if (ContextCompat.checkSelfPermission(requireActivity(), WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(requireActivity(), READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(requireActivity(), SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, SEND_SMS}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
@@ -126,6 +117,17 @@ public class HomeFragment extends Fragment {
                 ContextCompat.checkSelfPermission(requireActivity(), READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(requireActivity(), SEND_SMS) == PackageManager.PERMISSION_GRANTED) {
             initGUI();
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (!Environment.isExternalStorageManager()) {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                    Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
+                    intent.setData(uri);
+                    activityResultLauncher.launch(intent);
+                } else {
+                    initGUI();
+                }
+            }
         }
     }
 
