@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NavInflater navInflater = navHostFragment.getNavController().getNavInflater();
         NavGraph navGraph = navInflater.inflate(R.navigation.nav_graph);
         if (sharedPreferences.getBoolean(AppConstants.USER_LOGGED_IN, false)) {
-            navGraph.setStartDestination(R.id.homeFragment);
+            navGraph.setStartDestination(R.id.pinFragment);
         } else {
             navGraph.setStartDestination(R.id.loginFragment);
         }
@@ -149,6 +149,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     binding.title.setText(getString(R.string.transaction_history_fragment_title));
                 }
                 if (navDestination.getId() == R.id.loginFragment) {
+                    toolbar.setVisibility(View.GONE);
+                    binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                } else if (navDestination.getId() == R.id.pinFragment){
                     toolbar.setVisibility(View.GONE);
                     binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 } else {
@@ -364,8 +367,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                sharedPreferences.edit().clear().apply();
-                navController.navigate(R.id.action_homeFragment_to_loginFragment);
+//                sharedPreferences.edit().clear().apply();
+                navController.navigate(R.id.action_homeFragment_to_pinFragment);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

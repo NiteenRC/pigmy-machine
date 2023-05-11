@@ -24,9 +24,14 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
 
 import com.example.pigmy.databinding.FragmentLoginBinding;
+import com.example.pigmy.pflockscreen.SharedPref;
+import com.example.pigmy.pflockscreen.fragments.PFLockScreenFragment;
+import com.example.pigmy.pflockscreen.security.PFResult;
+import com.example.pigmy.pflockscreen.viewmodels.PFPinCodeViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -43,7 +48,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private FragmentLoginBinding binding;
     private SharedPreferences sharedPreferences;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
-
+    private SharedPref sharedPre;
+    private final PFPinCodeViewModel mPFPinCodeViewModel = new PFPinCodeViewModel();
     public LoginFragment() {
         // Required empty public constructor
     }
@@ -59,6 +65,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentLoginBinding.inflate(inflater, container, false);
+        sharedPre = new SharedPref(getActivity());
         askPermission();
         return binding.getRoot();
     }
@@ -67,6 +74,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding.btnLogin.setOnClickListener(this);
+        if (!sharedPreferences.getString(AppConstants.USER_CODE, "").isEmpty()){
+            binding.etCode.setEnabled(false);
+            binding.etCode.setText(sharedPreferences.getString(AppConstants.USER_CODE, ""));
+            binding.etPassword.setEnabled(false);
+            binding.etPassword.setText(sharedPreferences.getString(AppConstants.USER_PWD, ""));
+        }
     }
 
     @Override
@@ -152,6 +165,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                     String userName = document.getString("name");
                                     String shortName = document.getString("shortname");
                                     String userRole = document.getString("role");
+                                    String pwd = document.getString("pwd");
+                                    long pin = document.getLong("pin");
 
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -159,10 +174,35 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                     editor.putString(AppConstants.USER_CODE, code);
                                     editor.putString(AppConstants.USER_ROLE, userRole);
                                     editor.putString(AppConstants.USER_SHORT_NAME, shortName);
+                                    editor.putLong(AppConstants.USER_PIN_IN, pin);
+                                    editor.putString(AppConstants.USER_PWD, pwd);
                                     editor.putBoolean(AppConstants.USER_LOGGED_IN, true);
-
                                     editor.apply();
-                                    Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_homeFragment);
+
+                                    mPFPinCodeViewModel.encodePin(getContext(), String.valueOf(pin)).observe(getActivity(), new Observer<PFResult<String>>() {
+                                                @Override
+                                                public void onChanged(@Nullable PFResult<String> result) {
+                                                    if (result == null) {
+                                                        return;
+                                                    }
+//                                                    if (result.getError() != null) {
+//                                                        Log.d(TAG, "Can not encode pin code");
+//                                                        deleteEncodeKey();
+//                                                        return;
+//                                                    }
+                                                    final String encodedCode = result.getResult();
+                                                    Log.e("TAG", "onChanged: "+pin);
+//                                                    if (mCodeCreateListener != null) {
+                                                    final PFLockScreenFragment fragment = new PFLockScreenFragment();
+                                                    fragment.setEncodedPinCode(encodedCode);
+                                                        sharedPre.saveToPref(encodedCode, true);
+//                                                        mCodeCreateListener.onCodeCreated(encodedCode);
+//                                                    }
+                                                }
+                                            }
+                                    );
+
+                                    Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_pinFragment);
                                 }
                             }
                         } else {

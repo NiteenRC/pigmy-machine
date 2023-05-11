@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="pf_key_button" format="reference|integer"/>
+    <attr name="pf_lock_screen" format="reference|integer"/>
+    <attr name="pf_fingerprint_button" format="reference|integer"/>
+    <attr name="pf_delete_button" format="reference|integer"/>
+    <attr name="pf_code_view" format="reference|integer"/>
+    <attr name="pf_title" format="reference|integer"/>
+    <attr name="pf_hint" format="reference|integer"/>
+    <attr name="pf_next" format="reference|integer"/>
+
+    <attr name="BackgroundColor" format="color"/>
+    <attr name="BackgroundColor_S" format="color"/>
+    <attr name="BackgroundTint" format="color"/>
+    <attr name="Boder" format="color"/>
+    <attr name="Titel_1" format="color"/>
+    <attr name="Titel_2" format="color"/>
+    <attr name="icon_a" format="integer"/>
+</resources>
